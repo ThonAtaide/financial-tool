@@ -12,24 +12,40 @@ data class PersonEntity(
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long?,
+    var id: Long? = null,
 
     @Column(name = "PERSON_NAME")
-    val name: String,
+    var name: String,
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "PERSON_EXPENSE_GROUP",
-        joinColumns = [JoinColumn(name = "PERSON")],
-        inverseJoinColumns = [JoinColumn(name= "EXPENSE_GROUP")]
-    )
-    var expenseGroupsPersonIsMember: List<ExpenseGroupEntity>,
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "members" )
+    var expenseGroupsPersonIsMember: MutableList<ExpenseGroupEntity>? = mutableListOf(),
 
     @CreatedDate
     @Column(name = "CREATED_AT")
-    val createdAt: Instant,
+    var createdAt: Instant? = null,
 
     @LastModifiedDate
     @Column(name = "UPDATED_AT")
-    val updatedAt: Instant,
-)
+    var updatedAt: Instant? = null,
+) {
+
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PersonEntity
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
+
+    override fun toString(): String {
+        return "PersonEntity(id=$id, name='$name', createdAt=$createdAt, updatedAt=$updatedAt)"
+    }
+}
