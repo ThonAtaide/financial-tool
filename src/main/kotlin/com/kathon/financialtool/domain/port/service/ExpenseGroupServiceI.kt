@@ -13,5 +13,5 @@ interface ExpenseGroupServiceI {
 
     fun getUserExpenseGroupById(personId: Long, expenseGroupId: Long): ExpenseGroupDto
 
-    fun deleteUserExpenseGroup(personId: Long)
+    fun deleteUserExpenseGroup(personId: Long, expenseGroupId: Long)
 }

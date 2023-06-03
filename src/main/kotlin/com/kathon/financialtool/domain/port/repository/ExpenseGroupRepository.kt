@@ -12,7 +12,7 @@ interface ExpenseGroupRepository : JpaRepository<ExpenseGroupEntity, Long> {
 
     @Query(
         "SELECT EG FROM ExpenseGroupEntity EG " +
-                "INNER JOIN EG.members m where m.id= :member"
+                "INNER JOIN EG.members m where m.id= :member and EG.isActive = true"
     )
     fun findExpenseGroupEntitiesByMembersContaining(member: Long, pageRequest: Pageable): Page<ExpenseGroupEntity>
 }

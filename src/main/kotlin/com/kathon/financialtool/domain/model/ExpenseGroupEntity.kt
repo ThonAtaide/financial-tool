@@ -31,7 +31,10 @@ data class ExpenseGroupEntity(
         joinColumns = [JoinColumn(name = "EXPENSE_GROUP")],
         inverseJoinColumns = [JoinColumn(name = "PERSON")]
     )
-    var members: MutableList<PersonEntity> = mutableListOf(),
+    var members: MutableSet<PersonEntity> = mutableSetOf(),
+
+    @Column(name = "IS_ACTIVE", nullable = false)
+    var isActive: Boolean = true,
 
     @CreatedDate
     @Column(name = "CREATED_AT")
@@ -43,22 +46,24 @@ data class ExpenseGroupEntity(
 ) {
 
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+//    override fun equals(other: Any?): Boolean {
+//        if (this === other) return true
+//        if (javaClass != other?.javaClass) return false
+//
+//        other as ExpenseGroupEntity
+//
+//        if (id != other.id) return false
+//
+//        return true
+//    }
+//
+//    override fun hashCode(): Int {
+//        return id?.hashCode() ?: 0
+//    }
 
-        other as ExpenseGroupEntity
+//    override fun toString(): String {
+//        return "ExpenseGroupEntity(id=$id, name='$name', createdBy=$createdBy, createdAt=$createdAt, updatedAt=$updatedAt)"
+//    }
 
-        if (id != other.id) return false
 
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return id?.hashCode() ?: 0
-    }
-
-    override fun toString(): String {
-        return "ExpenseGroupEntity(id=$id, name='$name', createdBy=$createdBy, createdAt=$createdAt, updatedAt=$updatedAt)"
-    }
 }

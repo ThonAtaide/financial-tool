@@ -11,4 +11,5 @@ data class PersonDto(
 
     val updatedAt: Instant? = null,
 ) {
+
 }

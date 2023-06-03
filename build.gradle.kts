@@ -18,6 +18,8 @@ configurations {
     }
 }
 
+val mockkVersion by extra { "1.13.5" }
+
 repositories {
     mavenCentral()
 }
@@ -35,6 +37,8 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.mockk:mockk:${mockkVersion}")
+
 }
 
 tasks.withType<KotlinCompile> {

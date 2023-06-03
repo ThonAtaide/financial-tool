@@ -19,10 +19,11 @@ class ExpenseGroupService(
     private val personRepository: PersonRepository,
     private val expenseGroupRepository: ExpenseGroupRepository
 ) : ExpenseGroupServiceI {
+
     override fun createExpenseGroup(personId: Long, expenseGroupDto: ExpenseGroupDto): ExpenseGroupDto =
         personRepository.findById(personId)
             .map {
-                val newExpenseGroup = ExpenseGroupEntity(name = expenseGroupDto.name, members = mutableListOf(it))
+                val newExpenseGroup = ExpenseGroupEntity(name = expenseGroupDto.name, members = mutableSetOf(it))
                 return@map expenseGroupRepository.save(newExpenseGroup).toExpenseGroupDto()
             }.orElseThrow { PersonNotFoundException(personId) }
 
@@ -40,31 +41,35 @@ class ExpenseGroupService(
                 return@let expenseGroupRepository.save(it)
             }.toExpenseGroupDto()
 
-    override fun getUserExpenseGroups(personId: Long, pageSize: Int, pageNumber: Int): Page<ExpenseGroupDto> {
-        return personRepository.findById(personId)
-            .map {
-                expenseGroupRepository
-                    .findExpenseGroupEntitiesByMembersContaining(personId, PageRequest.of(pageNumber, pageSize))
-                    .map { it.toExpenseGroupDto() }
-            }.orElseThrow { PersonNotFoundException(personId) }
-    }
+    override fun getUserExpenseGroups(personId: Long, pageSize: Int, pageNumber: Int): Page<ExpenseGroupDto> =
+        expenseGroupRepository
+            .findExpenseGroupEntitiesByMembersContaining(personId, PageRequest.of(pageNumber, pageSize))
+            .map { it.toExpenseGroupDto() }
+
 
     override fun getUserExpenseGroupById(personId: Long, expenseGroupId: Long): ExpenseGroupDto =
         expenseGroupRepository.findById(expenseGroupId)
             .map { expenseGroupEntity ->
-                if (expenseGroupEntity.createdBy?.id != personId) throw ResourceUnauthorizedException()
+                val membersIdList = expenseGroupEntity.members.map { it.id }
+                if (!membersIdList.contains(personId)) throw ResourceUnauthorizedException()
                 return@map expenseGroupEntity.toExpenseGroupDto()
             }
             .orElseThrow { ExpenseGroupNotFoundException(expenseGroupId) }
 
-    override fun deleteUserExpenseGroup(personId: Long) {
-        TODO("Not yet implemented")
+    override fun deleteUserExpenseGroup(personId: Long, expenseGroupId: Long) {
+        expenseGroupRepository.findById(expenseGroupId)
+            .map {
+                if (it.createdBy?.id != personId) throw ResourceUnauthorizedException()
+                it.isActive = false
+                expenseGroupRepository.save(it)
+            }
+            .orElseThrow { ExpenseGroupNotFoundException(expenseGroupId) }
     }
 
     private fun validateExpenseGroupMembersAndUpdateIfNecessary(
-        membersDtoList: List<PersonDto>, expenseGroupEntity: ExpenseGroupEntity
+        membersDtoList: MutableList<PersonDto>, expenseGroupEntity: ExpenseGroupEntity
     ) {
-        val currentMembers = expenseGroupEntity.members.map { it.id }.orEmpty()
+        val currentMembers = expenseGroupEntity.members.map { it.id }
         membersDtoList.map { member ->
             if (!currentMembers.contains(member.id) && member.id != null) {
                 personRepository.findById(member.id!!)
