@@ -10,14 +10,21 @@ import org.springframework.stereotype.Repository
 @Repository
 interface FinancialAccountRepository : JpaRepository<FinancialAccountEntity, Long> {
 
-    @Query("SELECT FA FROM FinancialAccountEntity FA " +
-            "INNER JOIN ExpenseGroupEntity EG ON EG.id=FA.expenseGroupEntity.id " +
-            "WHERE EG.id = :expenseGroupId")
-    fun findFinancialAccountEntitiesByExpenseGroupEntity(expenseGroupId: Long, pageRequest: PageRequest): Page<FinancialAccountEntity>
+    @Query(
+        "SELECT FA FROM FinancialAccountEntity FA " +
+                "INNER JOIN ExpenseGroupEntity EG ON EG.id=FA.expenseGroupEntity.id " +
+                "WHERE EG.id = :expenseGroupId AND FA.isActive = true"
+    )
+    fun findFinancialAccountEntitiesByExpenseGroupEntity(
+        expenseGroupId: Long,
+        pageRequest: PageRequest
+    ): Page<FinancialAccountEntity>
 
-    @Query("SELECT FA FROM FinancialAccountEntity FA " +
-            "INNER JOIN ExpenseGroupEntity EG ON EG.id=FA.expenseGroupEntity.id " +
-            "WHERE EG.id = :expenseGroupId AND FA.createdBy.id = :personId ")
+    @Query(
+        "SELECT FA FROM FinancialAccountEntity FA " +
+                "INNER JOIN ExpenseGroupEntity EG ON EG.id=FA.expenseGroupEntity.id " +
+                "WHERE EG.id = :expenseGroupId AND FA.createdBy.id = :personId AND FA.isActive = true"
+    )
     fun findFinancialAccountEntitiesByExpenseGroupEntityAndCreatedByPerson(
         expenseGroupId: Long,
         personId: Long,

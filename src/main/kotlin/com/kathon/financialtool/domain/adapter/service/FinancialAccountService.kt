@@ -42,7 +42,8 @@ class FinancialAccountService(
         financialAccountDto: FinancialAccountDto
     ): FinancialAccountDto =
         financialAccountRepository
-            .findById(financialAccountId).orElseThrow { FinancialAccountNotFoundException(financialAccountId) }
+            .findById(financialAccountId)
+            .orElseThrow { FinancialAccountNotFoundException(financialAccountId) }
             .let {
                 if (personId != it.createdBy?.id) throw ResourceUnauthorizedException()
                 it.name = financialAccountDto.name
