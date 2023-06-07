@@ -23,6 +23,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import java.time.Instant
 import java.util.*
 
@@ -254,22 +256,92 @@ class FinancialAccountServiceTest : AbstractUnitTest() {
         }
     }
 
+    @Test
     @DisplayName(
         "Given an existent expenseGroupId" +
                 "When getFinancialAccountsByExpenseGroupAndFilter method is called " +
                 "Then it should returns a list of active accounts of group"
     )
     fun `test get financial accounts by expense group`() {
+        //given
+        val pageNumber = 1
+        val pageSize = 1
+        val expenseGroupId: Long = randomLongBiggerThanZero()
+        val expected =
+            mockFinancialAccountRepositoryFindAccountsByExpenseGroups(expenseGroupId)
+                .map { it.toFinancialAccountDto() }
 
+        //when
+        val actual = financialAccountService
+            .getFinancialAccountsByExpenseGroupAndFilter(
+                expenseGroupId = expenseGroupId,
+                pageNumber = pageNumber,
+                pageSize = pageSize
+            )
+        //then
+        assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
     }
 
+    @Test
     @DisplayName(
         "Given an existent expenseGroupId and a person id" +
                 "When getFinancialAccountsByExpenseGroupAndFilter method is called " +
                 "Then it should returns a list of active accounts of group that person is the creator"
     )
     fun `test get financial accounts by expense group and person`() {
+        //given
+        val pageNumber = 1
+        val pageSize = 1
+        val personId: Long = randomLongBiggerThanZero()
+        val expenseGroupId: Long = randomLongBiggerThanZero()
+        val expected =
+            mockFinancialAccountRepositoryFindAccountsByExpenseGroupsAndPersonId(expenseGroupId, personId)
+                .map { it.toFinancialAccountDto() }
+        //when
+        val actual = financialAccountService
+            .getFinancialAccountsByExpenseGroupAndFilter(
+                createdBy = personId,
+                expenseGroupId = expenseGroupId,
+                pageNumber = pageNumber,
+                pageSize = pageSize
+            )
+        //then
+        assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
+    }
 
+    private fun mockFinancialAccountRepositoryFindAccountsByExpenseGroupsAndPersonId(
+        expenseGroupId: Long,
+        personId: Long,
+    ): PageImpl<FinancialAccountEntity> {
+        val financialAccountEntities = listOf(
+            buildFinancialAccountEntity(randomLongBiggerThanZero()),
+        )
+        val pageRequest = PageRequest.of(1, 1)
+        val page = PageImpl(financialAccountEntities, pageRequest, financialAccountEntities.size.toLong())
+        every {
+            financialAccountRepository
+                .findFinancialAccountEntitiesByExpenseGroupEntityAndCreatedByPerson(
+                    eq(expenseGroupId),
+                    eq(personId),
+                    pageRequest
+                )
+        } returns page
+        return page
+    }
+
+    private fun mockFinancialAccountRepositoryFindAccountsByExpenseGroups(
+        expenseGroupId: Long,
+    ): PageImpl<FinancialAccountEntity> {
+        val financialAccountEntities = listOf(
+            buildFinancialAccountEntity(randomLongBiggerThanZero()),
+        )
+        val pageRequest = PageRequest.of(1, 1)
+        val page = PageImpl(financialAccountEntities, pageRequest, financialAccountEntities.size.toLong())
+        every {
+            financialAccountRepository
+                .findFinancialAccountEntitiesByExpenseGroupEntity(eq(expenseGroupId), pageRequest)
+        } returns page
+        return page
     }
 
     private fun mockFinancialAccountSave(financialAccountEntity: FinancialAccountEntity): FinancialAccountEntity {
