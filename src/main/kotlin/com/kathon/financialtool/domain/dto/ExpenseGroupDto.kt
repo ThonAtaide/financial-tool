@@ -12,6 +12,8 @@ data class ExpenseGroupDto(
 
     val members: MutableList<PersonDto>? = null,
 
+    val accounts: MutableList<FinancialAccountDto>? = null,
+
     val createdAt: Instant? = null,
 
     val updatedAt: Instant? = null,

@@ -56,7 +56,11 @@ class ExpenseGroupService(
             .map { expenseGroupEntity ->
                 val membersIdList = expenseGroupEntity.members.map { it.id }
                 if (!membersIdList.contains(personId)) throw ResourceUnauthorizedException()
-                return@map expenseGroupEntity.toExpenseGroupDto()
+                val expenseGroupFinAccountList = financialAccountService
+                    .getFinancialAccountsByExpenseGroupAndFilter(
+                        expenseGroupId = expenseGroupId
+                    ).content
+                return@map expenseGroupEntity.toExpenseGroupDto(expenseGroupFinAccountList)
             }
             .orElseThrow { ExpenseGroupNotFoundException(expenseGroupId) }
 

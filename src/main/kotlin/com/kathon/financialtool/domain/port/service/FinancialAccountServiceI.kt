@@ -20,8 +20,8 @@ interface FinancialAccountServiceI {
     fun getFinancialAccountsByExpenseGroupAndFilter(
         createdBy: Long? = null,
         expenseGroupId: Long,
-        pageNumber: Int,
-        pageSize: Int
+        pageNumber: Int = 0,
+        pageSize: Int = 100
     ): Page<FinancialAccountDto>
 
 }

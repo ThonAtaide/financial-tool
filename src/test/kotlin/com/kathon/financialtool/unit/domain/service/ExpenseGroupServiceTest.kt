@@ -3,6 +3,7 @@ package com.kathon.financialtool.unit.domain.service
 import com.kathon.financialtool.domain.adapter.service.ExpenseGroupService
 import com.kathon.financialtool.domain.adapter.service.FinancialAccountService
 import com.kathon.financialtool.domain.dto.ExpenseGroupDto
+import com.kathon.financialtool.domain.dto.FinancialAccountDto
 import com.kathon.financialtool.domain.exceptions.ExpenseGroupNotFoundException
 import com.kathon.financialtool.domain.exceptions.PersonNotFoundException
 import com.kathon.financialtool.domain.exceptions.ResourceUnauthorizedException
@@ -199,10 +200,11 @@ class ExpenseGroupServiceTest : AbstractUnitTest() {
         val expenseGroupDto = buildExpenseGroupDto()
         val expenseGroupId = expenseGroupDto.id
         val personId = expenseGroupDto.createdBy?.id
-
+        val expenseGroupAccountList =
+            mockGetFinancialAccountsByExpenseGroupFromService(expenseGroupId!!)
         val expectedExpenseGroup =
-            mockExpenseGroupFindById(expenseGroupId = expenseGroupId!!, expenseGroupDto = expenseGroupDto)
-                .toExpenseGroupDto()
+            mockExpenseGroupFindById(expenseGroupId = expenseGroupId, expenseGroupDto = expenseGroupDto)
+                .toExpenseGroupDto(expenseGroupAccountList)
 
         //when
         val currentExpenseGroup = expenseGroupService.getUserExpenseGroupById(personId!!, expenseGroupId)
@@ -297,6 +299,21 @@ class ExpenseGroupServiceTest : AbstractUnitTest() {
                 expenseGroupId
             )
         }
+    }
+
+    private fun mockGetFinancialAccountsByExpenseGroupFromService(
+        expenseGroupId: Long
+    ): MutableList<FinancialAccountDto> {
+        val accountList = mutableListOf(
+            buildFinancialAccountDto(),
+            buildFinancialAccountDto()
+        )
+        val page = PageImpl(accountList, PageRequest.of(0, 100), 2)
+        every {
+            financialAccountServiceI
+                .getFinancialAccountsByExpenseGroupAndFilter(expenseGroupId = expenseGroupId)
+        } returns page
+        return accountList
     }
 
     private fun mockFinancialAccountCreation(expenseGroupId: Long) {

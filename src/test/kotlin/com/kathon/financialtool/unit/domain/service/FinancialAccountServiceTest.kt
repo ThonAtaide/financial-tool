@@ -290,8 +290,6 @@ class FinancialAccountServiceTest : AbstractUnitTest() {
     )
     fun `test get financial accounts by expense group and person`() {
         //given
-        val pageNumber = 1
-        val pageSize = 1
         val personId: Long = randomLongBiggerThanZero()
         val expenseGroupId: Long = randomLongBiggerThanZero()
         val expected =
@@ -301,9 +299,7 @@ class FinancialAccountServiceTest : AbstractUnitTest() {
         val actual = financialAccountService
             .getFinancialAccountsByExpenseGroupAndFilter(
                 createdBy = personId,
-                expenseGroupId = expenseGroupId,
-                pageNumber = pageNumber,
-                pageSize = pageSize
+                expenseGroupId = expenseGroupId
             )
         //then
         assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
@@ -315,8 +311,9 @@ class FinancialAccountServiceTest : AbstractUnitTest() {
     ): PageImpl<FinancialAccountEntity> {
         val financialAccountEntities = listOf(
             buildFinancialAccountEntity(randomLongBiggerThanZero()),
+            buildFinancialAccountEntity(randomLongBiggerThanZero()),
         )
-        val pageRequest = PageRequest.of(1, 1)
+        val pageRequest = PageRequest.of(0, 100)
         val page = PageImpl(financialAccountEntities, pageRequest, financialAccountEntities.size.toLong())
         every {
             financialAccountRepository

@@ -1,6 +1,7 @@
 package com.kathon.financialtool.factories
 
 import com.kathon.financialtool.domain.dto.ExpenseGroupDto
+import com.kathon.financialtool.domain.dto.FinancialAccountDto
 import com.kathon.financialtool.domain.dto.PersonDto
 import com.kathon.financialtool.domain.model.ExpenseGroupEntity
 import com.kathon.financialtool.domain.model.PersonEntity
@@ -36,11 +37,13 @@ class ExpenseGroupFactory {
             createdBy: PersonDto = buildPersonDto(),
             createdAt: Instant = Instant.now(),
             updatedAt: Instant = Instant.now(),
+            accountList: MutableList<FinancialAccountDto>? = null
         ) = ExpenseGroupDto(
             id,
             name,
             createdBy,
             mutableListOf(createdBy),
+            accountList,
             createdAt,
             updatedAt
         )
