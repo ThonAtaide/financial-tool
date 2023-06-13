@@ -10,6 +10,7 @@ import com.kathon.financialtool.domain.model.ExpenseGroupEntity
 import com.kathon.financialtool.domain.port.repository.ExpenseGroupRepository
 import com.kathon.financialtool.domain.port.repository.PersonRepository
 import com.kathon.financialtool.domain.port.service.ExpenseGroupServiceI
+import com.kathon.financialtool.domain.port.service.FinancialAccountServiceI
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -17,14 +18,17 @@ import org.springframework.stereotype.Service
 @Service
 class ExpenseGroupService(
     private val personRepository: PersonRepository,
-    private val expenseGroupRepository: ExpenseGroupRepository
+    private val expenseGroupRepository: ExpenseGroupRepository,
+    private val financialAccountService: FinancialAccountServiceI
 ) : ExpenseGroupServiceI {
 
     override fun createExpenseGroup(personId: Long, expenseGroupDto: ExpenseGroupDto): ExpenseGroupDto =
         personRepository.findById(personId)
             .map {
                 val newExpenseGroup = ExpenseGroupEntity(name = expenseGroupDto.name, members = mutableSetOf(it))
-                return@map expenseGroupRepository.save(newExpenseGroup).toExpenseGroupDto()
+                val createdExpenseGroup = expenseGroupRepository.save(newExpenseGroup).toExpenseGroupDto()
+                financialAccountService.createFinancialAccount(createdExpenseGroup.id!!)
+                return@map createdExpenseGroup
             }.orElseThrow { PersonNotFoundException(personId) }
 
     override fun updateExpenseGroup(
@@ -52,7 +56,11 @@ class ExpenseGroupService(
             .map { expenseGroupEntity ->
                 val membersIdList = expenseGroupEntity.members.map { it.id }
                 if (!membersIdList.contains(personId)) throw ResourceUnauthorizedException()
-                return@map expenseGroupEntity.toExpenseGroupDto()
+                val expenseGroupFinAccountList = financialAccountService
+                    .getFinancialAccountsByExpenseGroupAndFilter(
+                        expenseGroupId = expenseGroupId
+                    ).content
+                return@map expenseGroupEntity.toExpenseGroupDto(expenseGroupFinAccountList)
             }
             .orElseThrow { ExpenseGroupNotFoundException(expenseGroupId) }
 
@@ -67,15 +75,18 @@ class ExpenseGroupService(
     }
 
     private fun validateExpenseGroupMembersAndUpdateIfNecessary(
-        membersDtoList: MutableList<PersonDto>, expenseGroupEntity: ExpenseGroupEntity
+        membersDtoList: MutableList<PersonDto>?, expenseGroupEntity: ExpenseGroupEntity
     ) {
-        val currentMembers = expenseGroupEntity.members.map { it.id }
-        membersDtoList.map { member ->
-            if (!currentMembers.contains(member.id) && member.id != null) {
-                personRepository.findById(member.id!!)
-                    .map { expenseGroupEntity.members.add(it) }
-                    .orElseThrow { PersonNotFoundException(member.id!!) }
-            }
-        }
+        val currentMembersIdList = expenseGroupEntity.members.map { it.id }
+        val inputMembersIdList = membersDtoList?.map { it.id }.orEmpty()
+
+        if (currentMembersIdList.containsAll(inputMembersIdList)
+            && inputMembersIdList.containsAll(currentMembersIdList)
+        ) return
+
+        val updatedMemberSet = mutableSetOf(expenseGroupEntity.createdBy!!)
+        personRepository.findAllById(inputMembersIdList)
+            .map { updatedMemberSet.add(it) }
+        expenseGroupEntity.members = updatedMemberSet
     }
 }

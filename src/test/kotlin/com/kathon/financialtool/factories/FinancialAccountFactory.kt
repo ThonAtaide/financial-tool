@@ -1,51 +1,38 @@
 package com.kathon.financialtool.factories
 
-import com.kathon.financialtool.domain.dto.ExpenseGroupDto
 import com.kathon.financialtool.domain.dto.FinancialAccountDto
 import com.kathon.financialtool.domain.dto.PersonDto
 import com.kathon.financialtool.domain.model.ExpenseGroupEntity
+import com.kathon.financialtool.domain.model.FinancialAccountEntity
 import com.kathon.financialtool.domain.model.PersonEntity
+import com.kathon.financialtool.factories.ExpenseGroupFactory.Companion.buildExpenseGroupEntity
 import com.kathon.financialtool.factories.PersonFactory.Companion.buildPersonDto
 import com.kathon.financialtool.factories.PersonFactory.Companion.buildPersonEntity
 import java.time.Instant
 import java.util.*
 
-class ExpenseGroupFactory {
+class FinancialAccountFactory {
 
     companion object {
-
-        fun buildExpenseGroupEntity(
+        fun buildFinancialAccountEntity(
             id: Long? = System.currentTimeMillis(),
             name: String = UUID.randomUUID().toString(),
             createdBy: PersonEntity = buildPersonEntity(),
-            isActive: Boolean = true,
+            expenseGroup: ExpenseGroupEntity = buildExpenseGroupEntity(),
             createdAt: Instant = Instant.now(),
-            updatedAt: Instant = Instant.now(),
-        ) = ExpenseGroupEntity(
-            id,
-            name,
-            createdBy,
-            mutableSetOf(createdBy),
-            isActive,
-            createdAt,
-            updatedAt
+            updatedAt: Instant = Instant.now()
+        ): FinancialAccountEntity = FinancialAccountEntity(
+            id, name, createdBy = createdBy, expenseGroupEntity = expenseGroup, createdAt = createdAt, updatedAt = updatedAt
         )
 
-        fun buildExpenseGroupDto(
+        fun buildFinancialAccountDto(
             id: Long? = System.currentTimeMillis(),
             name: String = UUID.randomUUID().toString(),
             createdBy: PersonDto = buildPersonDto(),
             createdAt: Instant = Instant.now(),
-            updatedAt: Instant = Instant.now(),
-            accountList: MutableList<FinancialAccountDto>? = null
-        ) = ExpenseGroupDto(
-            id,
-            name,
-            createdBy,
-            mutableListOf(createdBy),
-            accountList,
-            createdAt,
-            updatedAt
+            updatedAt: Instant = Instant.now()
+        ): FinancialAccountDto = FinancialAccountDto(
+            id, name, createdBy, createdAt, updatedAt
         )
     }
 }

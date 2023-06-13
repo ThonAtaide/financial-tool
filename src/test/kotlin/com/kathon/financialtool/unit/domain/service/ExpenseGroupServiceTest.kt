@@ -1,7 +1,9 @@
 package com.kathon.financialtool.unit.domain.service
 
 import com.kathon.financialtool.domain.adapter.service.ExpenseGroupService
+import com.kathon.financialtool.domain.adapter.service.FinancialAccountService
 import com.kathon.financialtool.domain.dto.ExpenseGroupDto
+import com.kathon.financialtool.domain.dto.FinancialAccountDto
 import com.kathon.financialtool.domain.exceptions.ExpenseGroupNotFoundException
 import com.kathon.financialtool.domain.exceptions.PersonNotFoundException
 import com.kathon.financialtool.domain.exceptions.ResourceUnauthorizedException
@@ -13,6 +15,7 @@ import com.kathon.financialtool.domain.port.repository.ExpenseGroupRepository
 import com.kathon.financialtool.domain.port.repository.PersonRepository
 import com.kathon.financialtool.factories.ExpenseGroupFactory.Companion.buildExpenseGroupDto
 import com.kathon.financialtool.factories.ExpenseGroupFactory.Companion.buildExpenseGroupEntity
+import com.kathon.financialtool.factories.FinancialAccountFactory.Companion.buildFinancialAccountDto
 import com.kathon.financialtool.factories.PersonFactory.Companion.buildPersonDto
 import com.kathon.financialtool.factories.PersonFactory.Companion.buildPersonEntity
 import com.kathon.financialtool.unit.AbstractUnitTest
@@ -39,6 +42,9 @@ class ExpenseGroupServiceTest : AbstractUnitTest() {
     @MockK
     private lateinit var expenseGroupRepository: ExpenseGroupRepository
 
+    @MockK
+    private lateinit var financialAccountServiceI: FinancialAccountService
+
     @InjectMockKs
     private lateinit var expenseGroupService: ExpenseGroupService
 
@@ -56,6 +62,7 @@ class ExpenseGroupServiceTest : AbstractUnitTest() {
 
         val personEntity = mockPersonFindByIdReturningFilledOptional(personId)
         val expenseGroupEntityAfterPersist = mockExpenseGroupSave(newExpenseGroupId, personEntity, expenseGroupDto.name)
+        mockFinancialAccountCreation(newExpenseGroupId)
 
         //when
         val createdExpenseGroup = expenseGroupService.createExpenseGroup(personId, expenseGroupDto)
@@ -98,7 +105,7 @@ class ExpenseGroupServiceTest : AbstractUnitTest() {
         val expected = mockExpenseGroupUpdate(
             expenseGroupEntityExistent.copy(
                 name = expenseGroupDto.name,
-                members = expenseGroupDto.members.map { it.toPersonEntity() }.toMutableSet(),
+                members = expenseGroupDto.members?.map { it.toPersonEntity() }.orEmpty().toMutableSet(),
             )
         ).toExpenseGroupDto()
 
@@ -193,10 +200,11 @@ class ExpenseGroupServiceTest : AbstractUnitTest() {
         val expenseGroupDto = buildExpenseGroupDto()
         val expenseGroupId = expenseGroupDto.id
         val personId = expenseGroupDto.createdBy?.id
-
+        val expenseGroupAccountList =
+            mockGetFinancialAccountsByExpenseGroupFromService(expenseGroupId!!)
         val expectedExpenseGroup =
-            mockExpenseGroupFindById(expenseGroupId = expenseGroupId!!, expenseGroupDto = expenseGroupDto)
-                .toExpenseGroupDto()
+            mockExpenseGroupFindById(expenseGroupId = expenseGroupId, expenseGroupDto = expenseGroupDto)
+                .toExpenseGroupDto(expenseGroupAccountList)
 
         //when
         val currentExpenseGroup = expenseGroupService.getUserExpenseGroupById(personId!!, expenseGroupId)
@@ -285,7 +293,31 @@ class ExpenseGroupServiceTest : AbstractUnitTest() {
         mockExpenseGroupFindById(expenseGroupId!!, expenseGroupDto)
 
         //when then
-        assertThrows<ResourceUnauthorizedException> { expenseGroupService.deleteUserExpenseGroup(invalidPersonId, expenseGroupId) }
+        assertThrows<ResourceUnauthorizedException> {
+            expenseGroupService.deleteUserExpenseGroup(
+                invalidPersonId,
+                expenseGroupId
+            )
+        }
+    }
+
+    private fun mockGetFinancialAccountsByExpenseGroupFromService(
+        expenseGroupId: Long
+    ): MutableList<FinancialAccountDto> {
+        val accountList = mutableListOf(
+            buildFinancialAccountDto(),
+            buildFinancialAccountDto()
+        )
+        val page = PageImpl(accountList, PageRequest.of(0, 100), 2)
+        every {
+            financialAccountServiceI
+                .getFinancialAccountsByExpenseGroupAndFilter(expenseGroupId = expenseGroupId)
+        } returns page
+        return accountList
+    }
+
+    private fun mockFinancialAccountCreation(expenseGroupId: Long) {
+        every { financialAccountServiceI.createFinancialAccount(expenseGroupId) } returns buildFinancialAccountDto()
     }
 
     private fun mockPersonFindByIdReturningEmptyOptional(personId: Long) {
