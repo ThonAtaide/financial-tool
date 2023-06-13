@@ -24,4 +24,5 @@ interface FinancialAccountServiceI {
         pageSize: Int = 100
     ): Page<FinancialAccountDto>
 
+    fun deleteFinancialAccount(personId: Long, financialAccountId: Long)
 }

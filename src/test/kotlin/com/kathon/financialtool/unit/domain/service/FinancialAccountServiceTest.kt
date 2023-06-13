@@ -305,6 +305,65 @@ class FinancialAccountServiceTest : AbstractUnitTest() {
         assertThat(actual).usingRecursiveComparison().isEqualTo(expected)
     }
 
+    @Test
+    @DisplayName(
+        "Given a existent expenseGroupId, a personId from fin account creator and a financialAccountDto with valid data" +
+                "When deleteFinancialAccount method is called " +
+                "Then the financial account active column should be updated to false"
+    )
+    fun `test financial account delete when financial account exists`() {
+        //given
+        val accountId: Long = randomLongBiggerThanZero()
+        val existentFinancialAccount = mockFinancialAccountFindByIdSuccessfully(accountId)
+        mockFinancialAccountSave(existentFinancialAccount.copy(isActive = false))
+        val personId: Long? = existentFinancialAccount.createdBy?.id
+
+        //when Then
+        financialAccountService.deleteFinancialAccount(personId!!, accountId)
+    }
+
+    @Test
+    @DisplayName(
+        "Given a existent expenseGroupId, a financialAccountDto with valid data and a person id different of fin account creator" +
+                "When deleteFinancialAccount method is called " +
+                "Then it should throws ResourceUnauthorizedException"
+    )
+    fun `test financial account delete when financial account exists but person is not the creator`() {
+        //given
+        val personId = randomLongBiggerThanZero()
+        val accountId: Long = randomLongBiggerThanZero()
+        mockFinancialAccountFindByIdSuccessfully(accountId)
+
+        //when then
+        assertThrows<ResourceUnauthorizedException> {
+            financialAccountService.deleteFinancialAccount(
+                personId,
+                accountId
+            )
+        }
+    }
+
+    @Test
+    @DisplayName(
+        "Given a non existent financialAccountId and a financialAccountDto with valid data" +
+                "When deleteFinancialAccount method is called " +
+                "Then it should throws FinancialAccountNotFoundException"
+    )
+    fun `test financial account delete when financial account is not found`() {
+        //given
+        val personId = randomLongBiggerThanZero()
+        val accountId: Long = randomLongBiggerThanZero()
+        mockFinancialAccountFindByIdOptionalEmpty(accountId)
+
+        //when then
+        assertThrows<FinancialAccountNotFoundException> {
+            financialAccountService.deleteFinancialAccount(
+                personId,
+                accountId
+            )
+        }
+    }
+
     private fun mockFinancialAccountRepositoryFindAccountsByExpenseGroupsAndPersonId(
         expenseGroupId: Long,
         personId: Long,

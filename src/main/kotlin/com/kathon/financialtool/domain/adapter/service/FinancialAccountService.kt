@@ -81,6 +81,16 @@ class FinancialAccountService(
         ).map { it.toFinancialAccountDto() }
     }
 
+    override fun deleteFinancialAccount(personId: Long, financialAccountId: Long) {
+        financialAccountRepository
+            .findById(financialAccountId)
+            .orElseThrow { FinancialAccountNotFoundException(financialAccountId) }
+            .let {
+                if (personId != it.createdBy?.id) throw ResourceUnauthorizedException()
+                it.isActive = false
+                return@let financialAccountRepository.save(it)
+            }
+    }
 
     private fun startFinancialAccountBuild(
         expenseGroupId: Long,
