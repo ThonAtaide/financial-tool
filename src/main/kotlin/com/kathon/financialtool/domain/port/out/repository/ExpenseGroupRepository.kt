@@ -1,4 +1,4 @@
-package com.kathon.financialtool.domain.port.repository
+package com.kathon.financialtool.domain.port.out.repository
 
 import com.kathon.financialtool.domain.model.ExpenseGroupEntity
 import org.springframework.data.domain.Page

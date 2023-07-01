@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "3.1.0"
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version "1.8.21"
+    kotlin("kapt") version "1.5.20"
     kotlin("plugin.spring") version "1.8.21"
     kotlin("plugin.jpa") version "1.8.21"
 }
@@ -25,6 +26,8 @@ repositories {
 }
 
 dependencies {
+    kapt("org.hibernate:hibernate-jpamodelgen:6.1.7.Final")
+    implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.0")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -33,12 +36,11 @@ dependencies {
 
     implementation("org.flywaydb:flyway-core")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    compileOnly("org.projectlombok:lombok")
     runtimeOnly("org.postgresql:postgresql")
-    annotationProcessor("org.projectlombok:lombok")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.mockk:mockk:${mockkVersion}")
-
+    testImplementation("com.h2database:h2")
 }
 
 tasks.withType<KotlinCompile> {
