@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
+import java.util.*
 
 interface ExpenseGroupServiceI {
 
@@ -17,7 +18,7 @@ interface ExpenseGroupServiceI {
         pageable: Pageable = PageRequest.of(0, 50, Sort.Direction.ASC, "name")
     ): Page<ExpenseGroupDto>
 
-    fun findUserExpenseGroupById(personId: Long, expenseGroupId: Long): ExpenseGroupDto
+    fun findUserExpenseGroupById(personId: Long, expenseGroupId: Long): Optional<ExpenseGroupDto>
 
     fun deleteUserExpenseGroup(personId: Long, expenseGroupId: Long)
 }

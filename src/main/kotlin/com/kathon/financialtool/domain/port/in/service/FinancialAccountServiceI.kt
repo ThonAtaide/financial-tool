@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
+import java.util.*
 
 interface FinancialAccountServiceI {
 
@@ -18,9 +19,10 @@ interface FinancialAccountServiceI {
         financialAccountDto: FinancialAccountDto
     ): FinancialAccountDto
 
-    fun getFinancialAccountsById(personId: Long, financialAccountId: Long): FinancialAccountDto
+    fun findFinancialAccountsById(personId: Long, financialAccountId: Long): Optional<FinancialAccountDto>
 
     fun searchExpenseGroupFinancialAccounts(
+        personId: Long,
         createdBy: Long? = null,
         expenseGroupId: Long,
         pageable: Pageable = PageRequest.of(0, 10, Sort.Direction.ASC)

@@ -39,7 +39,6 @@ class FindExpenseGroupsByPersonUseCaseTest: AbstractUnitTest() {
         val pageSize = randomIntBiggerThanZero()
         val pageNumber = randomIntBiggerThanZero()
         val expectedPage = mockExpenseGroupFindAllThatPersonIsMember(personId, pageSize, pageNumber)
-            .map { it.toExpenseGroupDto() }
 
         //when
         val currentPage =

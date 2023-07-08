@@ -33,6 +33,9 @@ data class ExpenseGroupEntity(
     )
     var members: MutableSet<PersonEntity> = mutableSetOf(),
 
+    @Transient
+    var finAccountList: MutableList<FinancialAccountEntity>? = mutableListOf(),
+
     @Column(name = "IS_ACTIVE", nullable = false)
     var isActive: Boolean = true,
 

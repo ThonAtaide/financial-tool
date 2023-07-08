@@ -29,7 +29,7 @@ data class AccountMovementEntity(
     var amount: BigDecimal,
 
     @Column(name = "MOVEMENT_DATE")
-    val movementDate: Instant,
+    var movementDate: Instant,
 
     @ManyToOne
     @JoinColumn(name = "FIN_ACCOUNT", nullable = false)

@@ -26,6 +26,7 @@ class ExpenseGroupFactory {
             name,
             createdBy,
             mutableSetOf(createdBy),
+            finAccountList = null,
             isActive,
             createdAt,
             updatedAt

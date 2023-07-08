@@ -56,7 +56,7 @@ class UpdateExpenseGroupUseCaseTest : AbstractUnitTest() {
                 name = expenseGroupDto.name,
                 members = expenseGroupDto.members?.map { it.toPersonEntity() }.orEmpty().toMutableSet(),
             )
-        ).toExpenseGroupDto()
+        )
 
         //when
         val updatedExpenseGroup =

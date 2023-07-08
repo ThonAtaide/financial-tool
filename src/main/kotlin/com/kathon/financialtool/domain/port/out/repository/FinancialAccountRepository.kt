@@ -42,25 +42,4 @@ interface FinancialAccountRepository : JpaRepository<FinancialAccountEntity, Lon
             }
         }
     }
-
-    @Query(
-        "SELECT FA FROM FinancialAccountEntity FA " +
-                "INNER JOIN ExpenseGroupEntity EG ON EG.id=FA.expenseGroupEntity.id " +
-                "WHERE EG.id = :expenseGroupId AND FA.isActive = true"
-    )
-    fun findFinancialAccountEntitiesByExpenseGroupEntity(
-        expenseGroupId: Long,
-        pageable: Pageable
-    ): Page<FinancialAccountEntity>
-
-    @Query(
-        "SELECT FA FROM FinancialAccountEntity FA " +
-                "INNER JOIN ExpenseGroupEntity EG ON EG.id=FA.expenseGroupEntity.id " +
-                "WHERE EG.id = :expenseGroupId AND FA.createdBy.id = :personId AND FA.isActive = true"
-    )
-    fun findFinancialAccountEntitiesByExpenseGroupEntityAndCreatedByPerson(
-        expenseGroupId: Long,
-        personId: Long,
-        pageable: Pageable
-    ): Page<FinancialAccountEntity>
 }

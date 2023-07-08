@@ -1,6 +1,5 @@
 package com.kathon.financialtool.unit.domain.usecase.financialAccount
 
-import com.kathon.financialtool.domain.exceptions.FinancialAccountNotFoundException
 import com.kathon.financialtool.domain.exceptions.ResourceUnauthorizedException
 import com.kathon.financialtool.domain.mapper.toFinancialAccountDto
 import com.kathon.financialtool.domain.model.FinancialAccountEntity
@@ -12,13 +11,13 @@ import com.kathon.financialtool.util.TestUtils
 import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.util.*
 
-class FindFinancialAccountByIdUseCaseTest: AbstractUnitTest() {
+class FindFinancialAccountByIdUseCaseTest : AbstractUnitTest() {
 
     @MockK
     private lateinit var financialAccountRepository: FinancialAccountRepository
@@ -40,9 +39,11 @@ class FindFinancialAccountByIdUseCaseTest: AbstractUnitTest() {
 
         //when
         val actual = findFinancialAccountByIdUseCase.findFinancialAccountsById(personId!!, accountId)
+            .get()
 
         //then
-        Assertions.assertThat(actual).usingRecursiveComparison().isEqualTo(financialAccountEntity.toFinancialAccountDto())
+        assertThat(actual)
+            .usingRecursiveComparison().isEqualTo(financialAccountEntity)
     }
 
     @Test
@@ -57,13 +58,12 @@ class FindFinancialAccountByIdUseCaseTest: AbstractUnitTest() {
         mockFinancialAccountFindByIdOptionalEmpty(accountId)
         val personId = TestUtils.randomLongBiggerThanZero()
 
-        //when then
-        assertThrows<FinancialAccountNotFoundException> {
+        assertThat(
             findFinancialAccountByIdUseCase.findFinancialAccountsById(
                 personId,
                 accountId
-            )
-        }
+            ).isEmpty
+        ).isTrue
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.kathon.financialtool.unit.domain.usecase.expenseGroup
 
+import com.kathon.financialtool.domain.exceptions.InvalidDataException
 import com.kathon.financialtool.domain.exceptions.PersonNotFoundException
 import com.kathon.financialtool.domain.mapper.toExpenseGroupDto
 import com.kathon.financialtool.domain.model.ExpenseGroupEntity
@@ -58,7 +59,7 @@ class CreateExpenseGroupUseCaseTest: AbstractUnitTest() {
 
         //then
         Assertions.assertThat(createdExpenseGroup).usingRecursiveComparison()
-            .isEqualTo(expenseGroupEntityAfterPersist.toExpenseGroupDto())
+            .isEqualTo(expenseGroupEntityAfterPersist)
         verify { financialAccountUseCase.createDefaultFinancialAccount(newExpenseGroupId) }
     }
 
@@ -75,7 +76,7 @@ class CreateExpenseGroupUseCaseTest: AbstractUnitTest() {
         mockPersonFindByIdReturningEmptyOptional(personId)
 
         //when and then
-        assertThrows<PersonNotFoundException> { createExpenseGroupUseCase.createExpenseGroup(personId, expenseGroupDto) }
+        assertThrows<InvalidDataException> { createExpenseGroupUseCase.createExpenseGroup(personId, expenseGroupDto) }
         verify(exactly = 0) { financialAccountUseCase.createDefaultFinancialAccount(any()) }
     }
 
@@ -106,7 +107,7 @@ class CreateExpenseGroupUseCaseTest: AbstractUnitTest() {
     }
 
     private fun mockFinancialAccountCreation(expenseGroupId: Long) {
-        every { financialAccountUseCase.createDefaultFinancialAccount(expenseGroupId) } returns FinancialAccountFactory.buildFinancialAccountDto()
+        every { financialAccountUseCase.createDefaultFinancialAccount(expenseGroupId) } returns FinancialAccountFactory.buildFinancialAccountEntity()
     }
 
     private fun mockPersonFindByIdReturningEmptyOptional(personId: Long) {

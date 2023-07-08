@@ -48,7 +48,7 @@ class CreateOrUpdateFinancialAccountUseCaseTest: AbstractUnitTest() {
         val accountId: Long = TestUtils.randomLongBiggerThanZero()
         val expenseGroupId: Long = TestUtils.randomLongBiggerThanZero()
         val expenseGroupEntity = mockExpenseGroupFindByIdSuccessfully(expenseGroupId)
-        val expected = mockFinancialAccountSave(accountId, expenseGroupEntity).toFinancialAccountDto()
+        val expected = mockFinancialAccountSave(accountId, expenseGroupEntity)
 
         //when
         val createdFinancialAccount = createOrUpdateFinancialAccountUseCase.createDefaultFinancialAccount(expenseGroupId)
@@ -90,7 +90,7 @@ class CreateOrUpdateFinancialAccountUseCaseTest: AbstractUnitTest() {
             accountId,
             expenseGroupEntity,
             accountName = financialAccountDto.name,
-        ).toFinancialAccountDto()
+        )
 
         //when
         val createdFinancialAccount =
@@ -133,7 +133,7 @@ class CreateOrUpdateFinancialAccountUseCaseTest: AbstractUnitTest() {
         val existentFinancialAccount = mockFinancialAccountFindByIdSuccessfully(accountId)
         existentFinancialAccount.name = UUID.randomUUID().toString()
         val financialAccountDto = existentFinancialAccount.toFinancialAccountDto()
-        val expected = mockFinancialAccountSave(existentFinancialAccount).toFinancialAccountDto()
+        val expected = mockFinancialAccountSave(existentFinancialAccount)
         val personId: Long? = existentFinancialAccount.createdBy?.id
 
         //when

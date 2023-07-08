@@ -1,6 +1,7 @@
 package com.kathon.financialtool.domain.usecase.expenseGroup
 
 import com.kathon.financialtool.domain.dto.ExpenseGroupDto
+import com.kathon.financialtool.domain.exceptions.InvalidDataException
 import com.kathon.financialtool.domain.exceptions.PersonNotFoundException
 import com.kathon.financialtool.domain.mapper.toExpenseGroupDto
 import com.kathon.financialtool.domain.model.ExpenseGroupEntity
@@ -16,12 +17,12 @@ class CreateExpenseGroupUseCase(
     private val financialAccountUseCase: CreateOrUpdateFinancialAccountUseCase
 ) {
 
-    fun createExpenseGroup(personId: Long, expenseGroupDto: ExpenseGroupDto): ExpenseGroupDto =
+    fun createExpenseGroup(personId: Long, expenseGroupDto: ExpenseGroupDto): ExpenseGroupEntity =
         personRepository.findById(personId)
             .map {
                 val newExpenseGroup = ExpenseGroupEntity(name = expenseGroupDto.name, members = mutableSetOf(it))
-                val createdExpenseGroup = expenseGroupRepository.save(newExpenseGroup).toExpenseGroupDto()
+                val createdExpenseGroup = expenseGroupRepository.save(newExpenseGroup)
                 financialAccountUseCase.createDefaultFinancialAccount(createdExpenseGroup.id!!)
                 return@map createdExpenseGroup
-            }.orElseThrow { PersonNotFoundException(personId) }
+            }.orElseThrow { InvalidDataException("É preciso informar um usuário válido.") }
 }

@@ -20,7 +20,7 @@ class UpdateExpenseGroupUseCase(
         personId: Long,
         expenseGroupId: Long,
         expenseGroupDto: ExpenseGroupDto
-    ): ExpenseGroupDto =
+    ): ExpenseGroupEntity =
         expenseGroupRepository.findById(expenseGroupId)
             .orElseThrow { ExpenseGroupNotFoundException(expenseGroupId) }
             .let {
@@ -28,7 +28,7 @@ class UpdateExpenseGroupUseCase(
                 it.name = expenseGroupDto.name
                 validateExpenseGroupMembersAndUpdateIfNecessary(expenseGroupDto.members, it)
                 return@let expenseGroupRepository.save(it)
-            }.toExpenseGroupDto()
+            }
 
     private fun validateExpenseGroupMembersAndUpdateIfNecessary(
         membersDtoList: MutableList<PersonDto>?, expenseGroupEntity: ExpenseGroupEntity

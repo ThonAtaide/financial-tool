@@ -20,24 +20,22 @@ class CreateOrUpdateFinancialAccountUseCase(
         const val EXPENSE_GROUP_FINANCIAL_ACCNT_DEFAULT_NAME = "Carteira"
     }
 
-    fun createDefaultFinancialAccount(expenseGroupId: Long): FinancialAccountDto =
+    fun createDefaultFinancialAccount(expenseGroupId: Long): FinancialAccountEntity =
         startFinancialAccountBuild(expenseGroupId)
             .let { financialAccountRepository.save(it) }
-            .toFinancialAccountDto()
 
     fun createFinancialAccount(
         expenseGroupId: Long,
         financialAccountDto: FinancialAccountDto
-    ): FinancialAccountDto =
+    ): FinancialAccountEntity =
         startFinancialAccountBuild(expenseGroupId, financialAccountDto.name)
             .let { financialAccountRepository.save(it) }
-            .toFinancialAccountDto()
 
     fun updateFinancialAccount(
         personId: Long,
         financialAccountId: Long,
         financialAccountDto: FinancialAccountDto
-    ): FinancialAccountDto =
+    ): FinancialAccountEntity =
         financialAccountRepository
             .findById(financialAccountId)
             .orElseThrow { FinancialAccountNotFoundException(financialAccountId) }
@@ -45,7 +43,7 @@ class CreateOrUpdateFinancialAccountUseCase(
                 if (personId != it.createdBy?.id) throw ResourceUnauthorizedException()
                 it.name = financialAccountDto.name
                 return@let financialAccountRepository.save(it)
-            }.toFinancialAccountDto()
+            }
 
     private fun startFinancialAccountBuild(
         expenseGroupId: Long,

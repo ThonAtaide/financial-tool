@@ -2,6 +2,7 @@ package com.kathon.financialtool.domain.usecase.expenseGroup
 
 import com.kathon.financialtool.domain.dto.ExpenseGroupDto
 import com.kathon.financialtool.domain.mapper.toExpenseGroupDto
+import com.kathon.financialtool.domain.model.ExpenseGroupEntity
 import com.kathon.financialtool.domain.port.out.repository.ExpenseGroupRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -12,8 +13,7 @@ class FindExpenseGroupsByPersonUseCase(
     private val expenseGroupRepository: ExpenseGroupRepository
 ) {
 
-    fun findExpenseGroupsByUser(personId: Long, pageable: Pageable): Page<ExpenseGroupDto> =
+    fun findExpenseGroupsByUser(personId: Long, pageable: Pageable): Page<ExpenseGroupEntity> =
         expenseGroupRepository
             .findExpenseGroupEntitiesByMembersContaining(personId, pageable)
-            .map { it.toExpenseGroupDto() }
 }

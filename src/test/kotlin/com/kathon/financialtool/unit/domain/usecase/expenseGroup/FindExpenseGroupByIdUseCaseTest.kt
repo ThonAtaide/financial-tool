@@ -7,6 +7,7 @@ import com.kathon.financialtool.domain.exceptions.ResourceUnauthorizedException
 import com.kathon.financialtool.domain.mapper.toExpenseGroupDto
 import com.kathon.financialtool.domain.mapper.toPersonEntity
 import com.kathon.financialtool.domain.model.ExpenseGroupEntity
+import com.kathon.financialtool.domain.model.FinancialAccountEntity
 import com.kathon.financialtool.domain.port.out.repository.ExpenseGroupRepository
 import com.kathon.financialtool.domain.usecase.expenseGroup.FindExpenseGroupByIdUseCase
 import com.kathon.financialtool.domain.usecase.financialAccount.FindAllFinancialAccountsUseCase
@@ -48,13 +49,14 @@ class FindExpenseGroupByIdUseCaseTest : AbstractUnitTest() {
         val expenseGroupId = expenseGroupDto.id
         val personId = expenseGroupDto.createdBy?.id
         val expenseGroupAccountList =
-            mockGetFinancialAccountsByExpenseGroupFromService(expenseGroupId!!)
+            mockGetFinancialAccountsByExpenseGroupFromService(personId!!, expenseGroupId!!)
         val expectedExpenseGroup =
             mockExpenseGroupFindById(expenseGroupId = expenseGroupId, expenseGroupDto = expenseGroupDto)
-                .toExpenseGroupDto(expenseGroupAccountList)
+        expectedExpenseGroup.finAccountList = expenseGroupAccountList
 
         //when
-        val currentExpenseGroup = findExpenseGroupByIdUseCase.findUserExpenseGroupsById(personId!!, expenseGroupId)
+        val currentExpenseGroup = findExpenseGroupByIdUseCase.findUserExpenseGroupsById(personId, expenseGroupId)
+            .get()
 
         //then
         assertThat(currentExpenseGroup).usingRecursiveComparison().isEqualTo(expectedExpenseGroup)
@@ -94,26 +96,26 @@ class FindExpenseGroupByIdUseCaseTest : AbstractUnitTest() {
         val expenseGroupId = TestUtils.randomLongBiggerThanZero()
         mockExpenseGroupFindByIdReturningEmptyOptional(expenseGroupId)
 
-        //when then
-        assertThrows<ExpenseGroupNotFoundException> {
+        assertThat(
             findExpenseGroupByIdUseCase.findUserExpenseGroupsById(
                 System.currentTimeMillis(),
                 expenseGroupId
-            )
-        }
+            ).isEmpty
+        ).isTrue
     }
 
     private fun mockGetFinancialAccountsByExpenseGroupFromService(
+        personId: Long,
         expenseGroupId: Long
-    ): MutableList<FinancialAccountDto> {
+    ): MutableList<FinancialAccountEntity> {
         val accountList = mutableListOf(
-            FinancialAccountFactory.buildFinancialAccountDto(),
-            FinancialAccountFactory.buildFinancialAccountDto()
+            FinancialAccountFactory.buildFinancialAccountEntity(),
+            FinancialAccountFactory.buildFinancialAccountEntity()
         )
         val page = PageImpl(accountList, PageRequest.of(0, 100), 2)
         every {
             findAllFinancialAccountsUseCase
-                .findFinancialAccountsBy(expenseGroupId = expenseGroupId, pageable = any())
+                .findFinancialAccountsBy(personId, expenseGroupId = expenseGroupId, pageable = any())
         } returns page
         return accountList
     }
