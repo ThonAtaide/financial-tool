@@ -4,7 +4,6 @@ import com.kathon.financialtool.domain.dto.ExpenseGroupDto
 import com.kathon.financialtool.domain.dto.PersonDto
 import com.kathon.financialtool.domain.exceptions.ExpenseGroupNotFoundException
 import com.kathon.financialtool.domain.exceptions.ResourceUnauthorizedException
-import com.kathon.financialtool.domain.mapper.toExpenseGroupDto
 import com.kathon.financialtool.domain.model.ExpenseGroupEntity
 import com.kathon.financialtool.domain.port.out.repository.ExpenseGroupRepository
 import com.kathon.financialtool.domain.port.out.repository.PersonRepository
@@ -31,7 +30,7 @@ class UpdateExpenseGroupUseCase(
             }
 
     private fun validateExpenseGroupMembersAndUpdateIfNecessary(
-        membersDtoList: MutableList<PersonDto>?, expenseGroupEntity: ExpenseGroupEntity
+        membersDtoList: List<PersonDto>?, expenseGroupEntity: ExpenseGroupEntity
     ) {
         val currentMembersIdList = expenseGroupEntity.members.map { it.id }
         val inputMembersIdList = membersDtoList?.map { it.id }.orEmpty()

@@ -10,9 +10,9 @@ data class ExpenseGroupDto(
 
     val createdBy: PersonDto? = null,
 
-    val members: MutableList<PersonDto>? = null,
+    val members: List<PersonDto>? = null,
 
-    val accounts: MutableList<FinancialAccountDto>? = null,
+    val accounts: List<FinancialAccountDto>? = null,
 
     val createdAt: Instant? = null,
 

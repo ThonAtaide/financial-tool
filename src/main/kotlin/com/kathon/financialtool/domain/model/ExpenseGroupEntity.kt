@@ -34,7 +34,7 @@ data class ExpenseGroupEntity(
     var members: MutableSet<PersonEntity> = mutableSetOf(),
 
     @Transient
-    var finAccountList: MutableList<FinancialAccountEntity>? = mutableListOf(),
+    var finAccountList: List<FinancialAccountEntity>? = mutableListOf(),
 
     @Column(name = "IS_ACTIVE", nullable = false)
     var isActive: Boolean = true,
@@ -48,25 +48,22 @@ data class ExpenseGroupEntity(
     var updatedAt: Instant? = null,
 ) {
 
+    override fun toString(): String {
+        return "ExpenseGroupEntity(id=$id, name='$name', isActive=$isActive, createdAt=$createdAt, updatedAt=$updatedAt)"
+    }
 
-//    override fun equals(other: Any?): Boolean {
-//        if (this === other) return true
-//        if (javaClass != other?.javaClass) return false
-//
-//        other as ExpenseGroupEntity
-//
-//        if (id != other.id) return false
-//
-//        return true
-//    }
-//
-//    override fun hashCode(): Int {
-//        return id?.hashCode() ?: 0
-//    }
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
 
-//    override fun toString(): String {
-//        return "ExpenseGroupEntity(id=$id, name='$name', createdBy=$createdBy, createdAt=$createdAt, updatedAt=$updatedAt)"
-//    }
+        other as ExpenseGroupEntity
 
+        if (id != other.id) return false
 
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
 }

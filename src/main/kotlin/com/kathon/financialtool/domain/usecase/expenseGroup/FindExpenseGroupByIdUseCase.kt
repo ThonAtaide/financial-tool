@@ -1,9 +1,6 @@
 package com.kathon.financialtool.domain.usecase.expenseGroup
 
-import com.kathon.financialtool.domain.dto.ExpenseGroupDto
-import com.kathon.financialtool.domain.exceptions.ExpenseGroupNotFoundException
 import com.kathon.financialtool.domain.exceptions.ResourceUnauthorizedException
-import com.kathon.financialtool.domain.mapper.toExpenseGroupDto
 import com.kathon.financialtool.domain.model.ExpenseGroupEntity
 import com.kathon.financialtool.domain.port.out.repository.ExpenseGroupRepository
 import com.kathon.financialtool.domain.usecase.financialAccount.FindAllFinancialAccountsUseCase
@@ -27,7 +24,7 @@ class FindExpenseGroupByIdUseCase(
                     .findFinancialAccountsBy(
                         personId = personId,
                         expenseGroupId = expenseGroupId,
-                        pageable = PageRequest.of(0, Int.MAX_VALUE, Sort.Direction.ASC, "created_at")
+                        pageable = PageRequest.of(0, Int.MAX_VALUE, Sort.Direction.ASC, "createdAt")
                     ).content
                 expenseGroupEntity.finAccountList = expenseGroupFinAccountList
                 return@map expenseGroupEntity
