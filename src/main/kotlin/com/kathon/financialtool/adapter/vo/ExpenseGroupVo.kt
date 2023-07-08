@@ -37,4 +37,10 @@ data class ExpenseGroupVo(
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     val updatedAt: Instant? = null,
-)
+) {
+    enum class SortFields(val field: String) {
+
+        CREATED_AT("createdAt"),
+        NAME("name")
+    }
+}

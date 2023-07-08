@@ -42,7 +42,7 @@ class ExpenseGroupController(
         ) personId: Long,
         @PathVariable("expense-group-id") expenseGroupId: Long,
         @Valid @RequestBody expenseGroupVo: ExpenseGroupVo
-    ) : ExpenseGroupVo = expenseGroupVo.toExpenseGroupDto()
+    ): ExpenseGroupVo = expenseGroupVo.toExpenseGroupDto()
         .let { expenseGroupServiceI.updateExpenseGroup(personId, expenseGroupId, it) }
         .toExpenseGroupVo()
 
@@ -73,10 +73,17 @@ class ExpenseGroupController(
             required = false,
             defaultValue = "10"
         ) pageSize: Int = 1,
-    ): Page<ExpenseGroupVo> =
-        expenseGroupServiceI
-            .findAllExpenseGroupsByPerson(personId, PageRequest.of(pageNumber, pageSize, ASC, "createdAt"))
+        @RequestHeader(
+            name = "orderBy",
+            required = false,
+        ) vararg sortFields: ExpenseGroupVo.SortFields,
+    ): Page<ExpenseGroupVo> {
+
+        val sortFieldList = sortFields.ifEmpty { arrayOf(ExpenseGroupVo.SortFields.CREATED_AT) }.map { it.field }.toTypedArray()
+        return expenseGroupServiceI
+            .findAllExpenseGroupsByPerson(personId, PageRequest.of(pageNumber, pageSize, ASC, *sortFieldList))
             .map { it.toExpenseGroupVo() }
+    }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{expense-group-id}")
