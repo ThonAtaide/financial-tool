@@ -8,7 +8,7 @@ import java.util.*
 
 fun ExpenseGroupVo.toExpenseGroupDto() = ExpenseGroupDto(
     id,
-    name,
+    name!!,
     members = Optional.ofNullable(members)
         .map { membersList -> membersList.map { it.toPersonDto() } }
         .orElse(emptyList())

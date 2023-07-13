@@ -4,12 +4,9 @@ import com.kathon.financialtool.domain.model.ExpenseGroupEntity_
 import com.kathon.financialtool.domain.model.FinancialAccountEntity
 import com.kathon.financialtool.domain.model.FinancialAccountEntity_
 import com.kathon.financialtool.domain.model.PersonEntity_
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
-import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import java.util.*
 
@@ -39,6 +36,14 @@ interface FinancialAccountRepository : JpaRepository<FinancialAccountEntity, Lon
                         )
                     }
                     .orElse(criteriaBuilder.conjunction())
+            }
+        }
+
+        fun isActiveEquals(isActive: Boolean = true): Specification<FinancialAccountEntity> {
+            return Specification<FinancialAccountEntity> { root, _, criteriaBuilder ->
+                criteriaBuilder.equal(
+                    root.get(FinancialAccountEntity_.isActive), isActive
+                )
             }
         }
     }

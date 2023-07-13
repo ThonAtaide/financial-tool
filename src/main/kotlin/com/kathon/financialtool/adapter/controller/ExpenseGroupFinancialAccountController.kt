@@ -3,20 +3,24 @@ package com.kathon.financialtool.adapter.controller
 import com.kathon.financialtool.adapter.mapper.toFinancialAccountDto
 import com.kathon.financialtool.adapter.mapper.toFinancialAccountVo
 import com.kathon.financialtool.adapter.vo.FinancialAccountVo
+import com.kathon.financialtool.adapter.vo.validation.ValidationGroupOnCreate
 import com.kathon.financialtool.domain.adapter.`in`.service.FinancialAccountService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
+@Validated
 @RestController
 @RequestMapping("/expense-groups/{expense-group-id}/financial-account")
 class ExpenseGroupFinancialAccountController(
     private val financialAccountService: FinancialAccountService
 ) {
 
+    @Validated(ValidationGroupOnCreate::class)
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     fun createFinancialAccount(
@@ -58,6 +62,7 @@ class ExpenseGroupFinancialAccountController(
             defaultValue = "CREATED_AT"
         ) vararg sortFields: FinancialAccountVo.SortFields,
         @PathVariable(name = "expense-group-id") expenseGroupId: Long,
+        @RequestParam(name = "created-by") createdBy: Long? = null
     ): Page<FinancialAccountVo> {
         val sortFieldList = sortFields
             .ifEmpty { arrayOf(FinancialAccountVo.SortFields.CREATED_AT) }
@@ -68,6 +73,7 @@ class ExpenseGroupFinancialAccountController(
             .searchExpenseGroupFinancialAccounts(
                 personId,
                 expenseGroupId = expenseGroupId,
+                createdBy = createdBy,
                 pageable = PageRequest.of(pageNumber, pageSize, order, *sortFieldList)
             )
             .map { it.toFinancialAccountVo() }

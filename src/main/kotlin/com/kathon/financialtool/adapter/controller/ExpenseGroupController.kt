@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
+@Validated
 @RestController
 @RequestMapping("/expense-group")
 class ExpenseGroupController(
@@ -34,6 +35,7 @@ class ExpenseGroupController(
             .let { expenseGroupServiceI.createExpenseGroup(personId, it) }
             .toExpenseGroupVo()
 
+    @Validated(ValidationGroupOnUpdate::class)
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{expense-group-id}")
     fun updateExpenseGroup(

@@ -19,7 +19,7 @@ data class ExpenseGroupVo(
         groups = [ValidationGroupOnCreate::class, ValidationGroupOnUpdate::class],
         message = "É preciso informar o nome do grupo."
     )
-    val name: String,
+    val name: String?= null,
 
     val createdBy: PersonVo? = null,
 

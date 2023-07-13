@@ -1,8 +1,6 @@
 package com.kathon.financialtool.domain.usecase.financialAccount
 
-import com.kathon.financialtool.domain.dto.FinancialAccountDto
 import com.kathon.financialtool.domain.exceptions.ResourceUnauthorizedException
-import com.kathon.financialtool.domain.mapper.toFinancialAccountDto
 import com.kathon.financialtool.domain.model.FinancialAccountEntity
 import com.kathon.financialtool.domain.port.out.repository.FinancialAccountRepository
 import com.kathon.financialtool.domain.usecase.expenseGroup.FindExpenseGroupsByPersonUseCase
@@ -32,6 +30,7 @@ class FindAllFinancialAccountsUseCase(
         val specification = Specification
             .where(FinancialAccountRepository.expenseGroupEquals(expenseGroupId))
             .and(FinancialAccountRepository.createdByEquals(createdBy))
+            .and(FinancialAccountRepository.isActiveEquals(true))
         return financialAccountRepository
             .findAll(specification, pageable)
     }
