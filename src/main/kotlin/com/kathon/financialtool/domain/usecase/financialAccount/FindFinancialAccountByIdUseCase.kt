@@ -11,7 +11,7 @@ class FindFinancialAccountByIdUseCase(
     private val financialAccountRepository: FinancialAccountRepository
 ) {
 
-    fun findFinancialAccountsById(personId: Long, financialAccountId: Long): Optional<FinancialAccountEntity> =
+    fun findFinancialAccountById(personId: Long, financialAccountId: Long): Optional<FinancialAccountEntity> =
         financialAccountRepository
             .findById(financialAccountId)
             .map {

@@ -61,12 +61,11 @@ class CreateAndUpdateExpenseMovementStrategy(
 
     override fun updateAccountMovement(
         personId: Long,
-        accountId: Long,
         accountMovementId: Long,
         accountMovementDto: AccountMovementDto
     ): AccountMovementEntity {
         val accountMovementEntity =
-            super.updateAccountMovement(personId, accountId, accountMovementId, accountMovementDto)
+            super.updateAccountMovement(personId, accountMovementId, accountMovementDto)
 
         val expenseMovementEntity = accountMovementEntity.expenseMovementEntity!!
 

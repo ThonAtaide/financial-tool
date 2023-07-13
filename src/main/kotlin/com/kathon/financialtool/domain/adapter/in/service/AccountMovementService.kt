@@ -1,17 +1,23 @@
 package com.kathon.financialtool.domain.adapter.`in`.service
 
 import com.kathon.financialtool.domain.dto.AccountMovementDto
+import com.kathon.financialtool.domain.enums.AccountMovementType
 import com.kathon.financialtool.domain.mapper.toAccountMovementDto
 import com.kathon.financialtool.domain.port.`in`.service.AccountMovementServiceI
 import com.kathon.financialtool.domain.usecase.accountMovement.CreateAccountMovementUseCase
+import com.kathon.financialtool.domain.usecase.accountMovement.FindAccountMovementByIdUseCase
+import com.kathon.financialtool.domain.usecase.accountMovement.FindAllAccountMovementsUseCase
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.time.Instant
+import java.util.*
 
 @Service
 class AccountMovementService(
-    private val createAccountMovementUseCase: CreateAccountMovementUseCase
+    private val createAccountMovementUseCase: CreateAccountMovementUseCase,
+    private val findAccountMovementByIdUseCase: FindAccountMovementByIdUseCase,
+    private val findAllAccountMovementsUseCase: FindAllAccountMovementsUseCase
 ) : AccountMovementServiceI {
 
     override fun createAccountMovement(
@@ -27,27 +33,31 @@ class AccountMovementService(
         personId: Long,
         accountMovementId: Long,
         accountMovementDto: AccountMovementDto
-    ): AccountMovementDto {
-        TODO("Not yet implemented")
-    }
+    ): AccountMovementDto =
+        createAccountMovementUseCase
+            .updateAccountMovement(personId, accountMovementId, accountMovementDto)
+            .toAccountMovementDto()
 
-    override fun findAccountMovementById(personId: Long, movementId: Long): AccountMovementDto {
-        TODO("Not yet implemented")
-    }
+    override fun findAccountMovementById(personId: Long, movementId: Long): Optional<AccountMovementDto> =
+        findAccountMovementByIdUseCase.findAccountMovementById(personId, movementId)
+            .map { it.toAccountMovementDto() }
 
     override fun findAllAccountMovementsBy(
+        personId: Long,
         expenseGroup: Long,
+        accountMovementTypeList: List<AccountMovementType>,
         movementName: String?,
-        financialAccount: Long?,
-        category: Long?,
-        paymentType: Long?,
+        financialAccountIdList: List<Long>,
+        expenseCategoryList: List<Long>,
+        paymentTypeList: List<Long>,
         createdBy: Long?,
-        rangeStart: LocalDateTime?,
-        rangeEnd: LocalDateTime?,
+        oldestLimit: Instant,
+        newestLimit: Instant,
         pageRequest: PageRequest
-    ): Page<AccountMovementDto> {
-        TODO("Not yet implemented")
-    }
+    ): Page<AccountMovementDto> = findAllAccountMovementsUseCase
+        .findAllAccountMovementsBy(
+            personId, expenseGroup, accountMovementTypeList, movementName, financialAccountIdList, expenseCategoryList
+        ).map { it.toAccountMovementDto() }
 
 
 }

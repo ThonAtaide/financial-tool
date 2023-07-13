@@ -1,7 +1,6 @@
 package com.kathon.financialtool.unit.domain.usecase.financialAccount
 
 import com.kathon.financialtool.domain.exceptions.ResourceUnauthorizedException
-import com.kathon.financialtool.domain.mapper.toFinancialAccountDto
 import com.kathon.financialtool.domain.model.FinancialAccountEntity
 import com.kathon.financialtool.domain.port.out.repository.FinancialAccountRepository
 import com.kathon.financialtool.domain.usecase.financialAccount.FindFinancialAccountByIdUseCase
@@ -38,7 +37,7 @@ class FindFinancialAccountByIdUseCaseTest : AbstractUnitTest() {
         val personId = financialAccountEntity.expenseGroupEntity.members.elementAt(0).id
 
         //when
-        val actual = findFinancialAccountByIdUseCase.findFinancialAccountsById(personId!!, accountId)
+        val actual = findFinancialAccountByIdUseCase.findFinancialAccountById(personId!!, accountId)
             .get()
 
         //then
@@ -59,7 +58,7 @@ class FindFinancialAccountByIdUseCaseTest : AbstractUnitTest() {
         val personId = TestUtils.randomLongBiggerThanZero()
 
         assertThat(
-            findFinancialAccountByIdUseCase.findFinancialAccountsById(
+            findFinancialAccountByIdUseCase.findFinancialAccountById(
                 personId,
                 accountId
             ).isEmpty
@@ -80,7 +79,7 @@ class FindFinancialAccountByIdUseCaseTest : AbstractUnitTest() {
 
         //when then
         assertThrows<ResourceUnauthorizedException> {
-            findFinancialAccountByIdUseCase.findFinancialAccountsById(
+            findFinancialAccountByIdUseCase.findFinancialAccountById(
                 personId,
                 accountId
             )

@@ -26,10 +26,14 @@ class CreateAccountMovementUseCase(
 
     fun updateAccountMovement(
         person: Long,
-        accountId: Long,
         accountMovementId: Long,
         accountMovementDto: AccountMovementDto
-    ): AccountMovementEntity {
-        TODO("NOT IMPLEMENTED YET")
-    }
+    ): AccountMovementEntity =
+        accountMovementCreatorAndUpdaterStrategies
+            .firstOrNull { it.supports(accountMovementDto) }
+            .let { strategy ->
+                Optional.ofNullable(strategy)
+                    .map { it.updateAccountMovement(person, accountMovementId, accountMovementDto) }
+                    .orElseThrow { Exception("Tipo de movimentação não implementada ainda.") }
+            }
 }

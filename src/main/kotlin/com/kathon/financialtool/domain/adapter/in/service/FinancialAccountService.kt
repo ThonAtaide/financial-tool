@@ -39,7 +39,7 @@ class FinancialAccountService(
 
     override fun findFinancialAccountsById(personId: Long, financialAccountId: Long): Optional<FinancialAccountDto> =
         findFinancialAccountByIdUseCase
-            .findFinancialAccountsById(personId, financialAccountId)
+            .findFinancialAccountById(personId, financialAccountId)
             .map { it.toFinancialAccountDto() }
 
     override fun searchExpenseGroupFinancialAccounts(

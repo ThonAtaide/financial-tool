@@ -2,10 +2,7 @@ package com.kathon.financialtool.domain.strategy.accountMovement
 
 import com.kathon.financialtool.domain.dto.AccountMovementDto
 import com.kathon.financialtool.domain.enums.AccountMovementType
-import com.kathon.financialtool.domain.exceptions.AccountMovementNotFoundException
-import com.kathon.financialtool.domain.exceptions.MissingRequiredDataException
-import com.kathon.financialtool.domain.exceptions.PersonNotFoundException
-import com.kathon.financialtool.domain.exceptions.ResourceUnauthorizedException
+import com.kathon.financialtool.domain.exceptions.*
 import com.kathon.financialtool.domain.model.AccountMovementEntity
 import com.kathon.financialtool.domain.model.FinancialAccountEntity
 import com.kathon.financialtool.domain.port.out.repository.AccountMovementRepository
@@ -32,7 +29,7 @@ abstract class AbstractCreateAndUpdateAccountMovementStrategy(
             .orElseThrow { PersonNotFoundException(personId) }
 
         val accountEntity = findFinancialAccountByIdUseCase
-            .findFinancialAccountsById(personId, accountId)
+            .findFinancialAccountById(personId, accountId)
             .orElseThrow { MissingRequiredDataException("É preciso informar uma conta válida.") }
 
         return AccountMovementEntity(
@@ -48,22 +45,26 @@ abstract class AbstractCreateAndUpdateAccountMovementStrategy(
 
     open fun updateAccountMovement(
         personId: Long,
-        accountId: Long,
         accountMovementId: Long,
         accountMovementDto: AccountMovementDto
     ): AccountMovementEntity {
 
         val accountMovementEntity = accountMovementRepository.findById(accountMovementId)
-            .orElseThrow { AccountMovementNotFoundException(accountId) }
+            .orElseThrow { AccountMovementNotFoundException(accountMovementId) }
 
         if (personDoNotBelongsToAccountMovementExpenseGroup(personId, accountMovementEntity.account)) {
             throw ResourceUnauthorizedException()
         }
 
         if (isFinancialAccountBeingUpdated(accountMovementEntity.account.id!!, accountMovementDto.accountId)) {
-            accountMovementEntity.account = findFinancialAccountByIdUseCase
-                .findFinancialAccountsById(personId, accountId)
+            val accountFound = findFinancialAccountByIdUseCase
+                .findFinancialAccountById(personId, accountMovementDto.accountId!!)
                 .orElseThrow { MissingRequiredDataException("É preciso informar uma conta válida.") }
+
+            if (newAccountIsNotFromSameExpenseGroup(accountFound, accountMovementEntity)) {
+                throw InvalidDataException("Não é possível alterar a despesa para uma conta de outro grupo de despesas.")
+            }
+            accountMovementEntity.account = accountFound
         }
         accountMovementEntity.name = accountMovementDto.name
         accountMovementEntity.description = accountMovementDto.description
@@ -71,6 +72,11 @@ abstract class AbstractCreateAndUpdateAccountMovementStrategy(
         accountMovementEntity.movementDate = accountMovementDto.movementDate
         return accountMovementEntity
     }
+
+    private fun newAccountIsNotFromSameExpenseGroup(
+        newAccount: FinancialAccountEntity,
+        accountMovementEntity: AccountMovementEntity
+    ) = newAccount.expenseGroupEntity != accountMovementEntity.account.expenseGroupEntity
 
     abstract fun supports(accountMovementDto: AccountMovementDto): Boolean
 
