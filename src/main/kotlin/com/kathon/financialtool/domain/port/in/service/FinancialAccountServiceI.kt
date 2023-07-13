@@ -9,8 +9,6 @@ import java.util.*
 
 interface FinancialAccountServiceI {
 
-    fun createFinancialAccount(expenseGroupId: Long): FinancialAccountDto
-
     fun createFinancialAccount(expenseGroupId: Long, financialAccountDto: FinancialAccountDto): FinancialAccountDto
 
     fun updateFinancialAccount(

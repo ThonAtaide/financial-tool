@@ -9,13 +9,13 @@ import com.kathon.financialtool.domain.port.`in`.service.ExpenseGroupServiceI
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort.Direction.ASC
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/expense-groups")
+@RequestMapping("/expense-group")
 class ExpenseGroupController(
     private val expenseGroupServiceI: ExpenseGroupServiceI
 ) {
@@ -67,21 +67,29 @@ class ExpenseGroupController(
             name = "page-number",
             required = false,
             defaultValue = "0"
-        ) pageNumber: Int = 1,
+        ) pageNumber: Int,
         @RequestHeader(
             name = "page-size",
             required = false,
             defaultValue = "10"
-        ) pageSize: Int = 1,
+        ) pageSize: Int,
+        @RequestHeader(
+            name = "order",
+            required = false,
+            defaultValue = "ASC"
+        ) order: Sort.Direction,
         @RequestHeader(
             name = "orderBy",
             required = false,
+            defaultValue = "CREATED_AT"
         ) vararg sortFields: ExpenseGroupVo.SortFields,
     ): Page<ExpenseGroupVo> {
 
-        val sortFieldList = sortFields.ifEmpty { arrayOf(ExpenseGroupVo.SortFields.CREATED_AT) }.map { it.field }.toTypedArray()
+        val sortFieldList = sortFields
+            .ifEmpty { arrayOf(ExpenseGroupVo.SortFields.CREATED_AT) }
+            .map { it.field }.toTypedArray()
         return expenseGroupServiceI
-            .findAllExpenseGroupsByPerson(personId, PageRequest.of(pageNumber, pageSize, ASC, *sortFieldList))
+            .findAllExpenseGroupsByPerson(personId, PageRequest.of(pageNumber, pageSize, order, *sortFieldList))
             .map { it.toExpenseGroupVo() }
     }
 

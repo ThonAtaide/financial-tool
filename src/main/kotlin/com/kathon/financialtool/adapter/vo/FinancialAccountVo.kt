@@ -14,4 +14,9 @@ data class FinancialAccountVo(
 
     var updatedAt: Instant? = null,
 ) {
+    enum class SortFields(val field: String) {
+        CREATED_AT("createdAt"),
+        NAME("name"),
+        CREATED_BY_NAME("createdBy.name")
+    }
 }

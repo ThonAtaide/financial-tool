@@ -10,3 +10,8 @@ fun FinancialAccountDto.toFinancialAccountVo() = FinancialAccountVo(
     createdAt,
     updatedAt
 )
+
+fun FinancialAccountVo.toFinancialAccountDto() = FinancialAccountDto(
+    id,
+    name
+)

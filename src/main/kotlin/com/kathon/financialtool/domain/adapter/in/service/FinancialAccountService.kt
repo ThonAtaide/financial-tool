@@ -20,11 +20,6 @@ class FinancialAccountService(
     private val deleteFinancialAccountUseCase: DeleteFinancialAccountUseCase
 ) : FinancialAccountServiceI {
 
-    override fun createFinancialAccount(expenseGroupId: Long): FinancialAccountDto =
-        createOrUpdateFinancialAccountUseCase
-            .createDefaultFinancialAccount(expenseGroupId)
-            .toFinancialAccountDto()
-
     override fun createFinancialAccount(
         expenseGroupId: Long,
         financialAccountDto: FinancialAccountDto

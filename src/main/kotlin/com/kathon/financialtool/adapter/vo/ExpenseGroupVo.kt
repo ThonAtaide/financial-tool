@@ -39,7 +39,6 @@ data class ExpenseGroupVo(
     val updatedAt: Instant? = null,
 ) {
     enum class SortFields(val field: String) {
-
         CREATED_AT("createdAt"),
         NAME("name")
     }
